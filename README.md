@@ -1,2 +1,3 @@
-# nexus-update
-Nexus DR-X Update Scripts
+# nexus-updater
+ Script to keep the Nexus DR-X up to date
+test
