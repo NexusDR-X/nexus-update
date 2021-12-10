@@ -893,8 +893,11 @@ do
       	;;
       libax25)
       	echo "===== $APP installed/updated ====="
-      	apt -y download $HOME/$APP
-      	sudo dpkg -i --force-overwrite ${HOME}/libax25_*${PKG_TYPE} || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
+      	pushd . >/dev/null
+      	cd $HOME
+      	apt -y download $APP
+      	popd >/dev/null
+      	sudo dpkg -i --force-overwrite $HOME/libax25_*${PKG_TYPE} || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
         	echo "===== $APP installed/updated ====="
       	;;
 		ax25mail-utils|direwolf|fldigi|flcluster|flamp|fllog|\
