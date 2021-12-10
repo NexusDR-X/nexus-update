@@ -893,14 +893,14 @@ do
       	;;
       libax25)
       	echo "===== $APP installed/updated ====="
-      	apt download $HOME/$APP
+      	apt -y download $HOME/$APP
       	sudo dpkg -i --force-overwrite ${HOME}/libax25_*${PKG_TYPE} || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
         	echo "===== $APP installed/updated ====="
       	;;
 		ax25mail-utils|direwolf|fldigi|flcluster|flamp|fllog|\
 flmsg|flrig|flwrap|gpredict|hamlib|linpac|ax25-apps|ax25-tools|\
 pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
-			sudo apt install $APP || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
+			sudo apt -y install $APP || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
         	echo "===== $APP installed/updated ====="
       	;;
 
