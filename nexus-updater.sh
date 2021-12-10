@@ -891,14 +891,17 @@ do
       	sudo pip3 install mgzip
       	NexusLocalRepoUpdate nexus-backup-restore $NEXUS_BU_RS_GIT_URL
       	;;
+      libax25)
+      	echo "===== $APP installed/updated ====="
+      	apt download $HOME/$APP
+      	sudo dpkg -i --force-overwrite ${HOME}/libax25_*${PKG_TYPE} || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
+        	echo "===== $APP installed/updated ====="
+      	;;
 		ax25mail-utils|direwolf|fldigi|flcluster|flamp|fllog|\
-flmsg|flrig|flwrap|gpredict|hamlib|linpac|libax25|ax25-apps|ax25-tools|\
+flmsg|flrig|flwrap|gpredict|hamlib|linpac|ax25-apps|ax25-tools|\
 pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
-			if (LocalRepoUpdate $APP $NEXUSDRX_GIT_URL/$APP) || [[ $FORCE == $TRUE ]]
-      	then
-      		sudo dpkg -i ${SRC_DIR}/${APP}/${APP}_*${PKG_TYPE} || { echo >&2 "===== dpkg -i $APP failed. ====="; SafeExit 1; }
-	        	echo "===== $APP installed/updated ====="
-      	fi
+			sudo apt install $APP || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
+        	echo "===== $APP installed/updated ====="
       	;;
 
    	nexus-update)
