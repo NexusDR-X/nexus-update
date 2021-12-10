@@ -745,7 +745,7 @@ fi
 CheckInternet
 
 # Check for self updates requested
-if [[ $SELF_UPDATE == $TRUE ]] && NexusLocalRepoUpdate nexus-updater $NEXUS_UPDATER_GIT_URL
+if [[ $SELF_UPDATE == $TRUE ]] && NexusLocalRepoUpdate nexus-update $NEXUS_UPDATER_GIT_URL
 then
 	if [[ $GUI == $TRUE ]]
 	then
@@ -908,7 +908,7 @@ pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
       	;;
 
    	nexus-update)
-   		NexusLocalRepoUpdate nexus-updater $NEXUS_UPDATER_GIT_URL
+   		NexusLocalRepoUpdate nexus-update $NEXUS_UPDATE_GIT_URL
    		;;
 
       arim)
