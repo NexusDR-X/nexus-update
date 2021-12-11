@@ -371,7 +371,7 @@ function GenerateList () {
 						echo -e "FALSE\n$A\n${DESC[$A]}\nNew Install" >> "$TFILE"
 					fi
 					;;
-				nexus-utilities)
+				nexus-utils)
 					if command -v initialize-pi.sh 1>/dev/null 2>&1
 					then
 						echo -e "${CHECKED[$1]}\n$A\n${DESC[$A]}\nInstalled - Check for Updates" >> "$TFILE" 
@@ -488,7 +488,7 @@ function Help () {
 	APPS[wsjtx]="https://physics.princeton.edu/pulsar/K1JT/wsjtx.html"
 	APPS[xastir]="http://xastir.org/index.php/Main_Page"
 	APPS[nexus-backup-restore]="https://github.com/AG7GN/nexus-backup-restore/blob/master/README.md"
-	APPS[nexus-utilities]="https://github.com/AG7GN/nexus-utilities/blob/master/README.md"
+	APPS[nexus-utils]="$NEXUSDRX_GIT_URL/nexus-utils/blob/master/README.md"
 	APPS[autohotspot]="https://github.com/AG7GN/autohotspot/blob/master/README.md"
 	APPS[710]="https://github.com/AG7GN/kenwood/blob/master/README.md"
 	APPS[rmsgw]="$NEXUSDRX_GIT_URL/rmsgw/blob/master/README.md"
@@ -540,8 +540,8 @@ PIARDOP_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardopc"
 PIARDOP2_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardop2"
 CHIRP_URL="https://trac.chirp.danplanet.com/chirp_daily/LATEST"
 NEXUS_UPDATE_GIT_URL="$NEXUSDRX_GIT_URL/nexus-update"
-NEXUSUTILS_GIT_URL="$GITHUB_URL/AG7GN/nexus-utilities"
-NEXUS_AUDIO_GIT_URL="$GITHUB_URL/AG7GN/nexus-audio"
+NEXUS_UTILS_GIT_URL="$NEXUSDRX_GIT_URL/nexus-utils"
+NEXUS_AUDIO_GIT_URL="$NEXUSDRX_GIT_URL/nexus-audio"
 AUTOHOTSPOT_GIT_URL="$GITHUB_URL/AG7GN/autohotspot"
 KENWOOD_GIT_URL="$GITHUB_URL/AG7GN/kenwood"
 NEXUS_BU_RS_GIT_URL="$GITHUB_URL/AG7GN/nexus-backup-restore"
@@ -583,7 +583,7 @@ DESC[nexus-backup-restore]="Nexus Backup/Restore scripts"
 #DESC[nexus-iptables]="Firewall Rules for Nexus Image"
 DESC[nexus-rmsgw]="RMS Gateway software for the Nexus Image"
 DESC[nexus-update]="This Updater script"
-DESC[nexus-utilities]="Scripts and Apps for Nexus Image"
+DESC[nexus-utils]="Scripts and Apps for Nexus Image"
 DESC[js8call]="Weak signal messaging using JS8"
 DESC[linpac]="AX.25 keyboard to keyboard chat and PBBS"
 DESC[linbpq]="G8BPQ AX25 Networking Package"
@@ -610,10 +610,10 @@ eval $(cat /etc/*-release | grep -E '^VERSION_CODENAME')
 if (( $(getconf LONG_BIT) == 64 ))
 then
 	PKG_TYPE="arm64.deb"
-	LIST="710 autohotspot chirp direwolf flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linpac nexus-backup-restore nexus-update nexus-utilities pat qsstv rmsgw uronode wfview wsjtx yaac xastir"
+	LIST="710 autohotspot chirp direwolf flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linpac nexus-backup-restore nexus-update nexus-utils pat qsstv rmsgw uronode wfview wsjtx yaac xastir"
 else
 	PKG_TYPE="armhf.deb"
-	LIST="710 autohotspot chirp direwolf flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linbpq linpac nexus-backup-restore nexus-update nexus-utilities pat piardop qsstv rmsgw uronode wfview wsjtx yaac xastir"
+	LIST="710 autohotspot chirp direwolf flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linbpq linpac nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rmsgw uronode wfview wsjtx yaac xastir"
 fi
 
 # Add apps to temporarily disable from install/update process in this variable. Set to
@@ -878,9 +878,9 @@ do
       	NexusLocalRepoUpdate "710 scripts" $KENWOOD_GIT_URL
       	;;
 
-      nexus-utilities)
+      nexus-utils)
       	CheckDepInstalled "imagemagick socat wmctrl"
-      	NexusLocalRepoUpdate nexus-utilities $NEXUSUTILS_GIT_URL
+      	NexusLocalRepoUpdate nexus-utils $NEXUS_UTILS_GIT_URL
       	;;
 
       nexus-audio)
@@ -891,6 +891,7 @@ do
       	sudo pip3 install mgzip
       	NexusLocalRepoUpdate nexus-backup-restore $NEXUS_BU_RS_GIT_URL
       	;;
+
       libax25)
       	echo "===== $APP installed/updated ====="
       	pushd . >/dev/null
@@ -900,6 +901,7 @@ do
       	sudo dpkg -i --force-overwrite $HOME/libax25_*${PKG_TYPE} || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
         	echo "===== $APP installed/updated ====="
       	;;
+
 		ax25mail-utils|direwolf|fldigi|flcluster|flamp|fllog|\
 flmsg|flrig|flwrap|gpredict|hamlib|linpac|ax25-apps|ax25-tools|\
 pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
