@@ -505,6 +505,8 @@ function Help () {
 	APPS[xastir]="http://xastir.org/index.php/Main_Page"
 	APPS[nexus-backup-restore]="https://github.com/AG7GN/nexus-backup-restore/blob/master/README.md"
 	APPS[nexus-utils]="$NEXUSDRX_GIT_URL/nexus-utils/blob/master/README.md"
+	APPS[direwolf-utils]="$NEXUSDRX_GIT_URL/direwolf-utils/blob/master/README.md"
+	APPS[rigctl-utils]="$NEXUSDRX_GIT_URL/rigctl-utils/blob/master/README.md"
 	APPS[autohotspot]="https://github.com/AG7GN/autohotspot/blob/master/README.md"
 	APPS[710]="https://github.com/AG7GN/kenwood/blob/master/README.md"
 	APPS[rmsgw]="$NEXUSDRX_GIT_URL/rmsgw/blob/master/README.md"
@@ -602,6 +604,8 @@ DESC[nexus-backup-restore]="Nexus Backup/Restore scripts"
 DESC[nexus-rmsgw]="RMS Gateway software for the Nexus Image"
 DESC[nexus-update]="This Updater script"
 DESC[nexus-utils]="Scripts and Apps for Nexus Image"
+DESC[direwolf-utils]="Scripts and GUIs for Direwolf"
+DESC[rigctl-utils]="Scripts and GUIs for rigctl"
 DESC[js8call]="Weak signal messaging using JS8"
 DESC[linpac]="AX.25 keyboard to keyboard chat and PBBS"
 DESC[linbpq]="G8BPQ AX25 Networking Package"
@@ -902,6 +906,7 @@ do
       	;;
 
 		direwolf-utils)
+			CheckDepInstalled "socat"
 			NexusLocalRepoUpdate direwolf-utils $DIREWOLF_UTILS_GIT_URL
 			;;
 		
