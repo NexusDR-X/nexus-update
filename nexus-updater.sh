@@ -905,7 +905,7 @@ do
 			NexusLocalRepoUpdate direwolf-utils $DIREWOLF_UTILS_GIT_URL
 			;;
 		
-		rigctl-utils
+		rigctl-utils)
 			NexusLocalRepoUpdate rigctl-utils $RIGCTL_UTILS_GIT_URL		
 			;;
       
