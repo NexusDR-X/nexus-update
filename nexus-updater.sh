@@ -906,7 +906,7 @@ do
 			;;
 		
 		rigctl-utils
-		
+			NexusLocalRepoUpdate rigctl-utils $RIGCTL_UTILS_GIT_URL		
 			;;
       
       nexus-audio)
