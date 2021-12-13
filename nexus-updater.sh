@@ -42,7 +42,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.0.0
+#-    version         ${SCRIPT_NAME} 3.0.1
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -379,6 +379,22 @@ function GenerateList () {
 						echo -e "FALSE\n$A\n${DESC[$A]}\nNew Install" >> "$TFILE"
 					fi
 					;;
+				direwolf-utils)
+					if command -v dw_pat_gui.sh 1>/dev/null 2>&1
+					then
+						echo -e "${CHECKED[$1]}\n$A\n${DESC[$A]}\nInstalled - Check for Updates" >> "$TFILE" 
+					else
+						echo -e "FALSE\n$A\n${DESC[$A]}\nNew Install" >> "$TFILE"
+					fi
+					;;
+				rigctl-utils)
+					if command -v rigctl_gui.sh 1>/dev/null 2>&1
+					then
+						echo -e "${CHECKED[$1]}\n$A\n${DESC[$A]}\nInstalled - Check for Updates" >> "$TFILE" 
+					else
+						echo -e "FALSE\n$A\n${DESC[$A]}\nNew Install" >> "$TFILE"
+					fi
+					;;
 				rmsgw)
 					if command -v rmsgw_aci 1>/dev/null 2>&1
 					then
@@ -541,6 +557,8 @@ PIARDOP2_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardop2"
 CHIRP_URL="https://trac.chirp.danplanet.com/chirp_daily/LATEST"
 NEXUS_UPDATE_GIT_URL="$NEXUSDRX_GIT_URL/nexus-update"
 NEXUS_UTILS_GIT_URL="$NEXUSDRX_GIT_URL/nexus-utils"
+DIREWOLF_UTILS_GIT_URL="$NEXUSDRX_GIT_URL/direwolf-utils"
+RIGCTL_UTILS_GIT_URL="$NEXUSDRX_GIT_URL/rigctl-utils"
 NEXUS_AUDIO_GIT_URL="$NEXUSDRX_GIT_URL/nexus-audio"
 AUTOHOTSPOT_GIT_URL="$GITHUB_URL/AG7GN/autohotspot"
 KENWOOD_GIT_URL="$GITHUB_URL/AG7GN/kenwood"
@@ -610,10 +628,10 @@ eval $(cat /etc/*-release | grep -E '^VERSION_CODENAME')
 if (( $(getconf LONG_BIT) == 64 ))
 then
 	PKG_TYPE="arm64.deb"
-	LIST="710 autohotspot chirp direwolf flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linpac nexus-backup-restore nexus-update nexus-utils pat qsstv rmsgw uronode wfview wsjtx yaac xastir"
+	LIST="710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linpac nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw uronode wfview wsjtx yaac xastir"
 else
 	PKG_TYPE="armhf.deb"
-	LIST="710 autohotspot chirp direwolf flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linbpq linpac nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rmsgw uronode wfview wsjtx yaac xastir"
+	LIST="710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linbpq linpac nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw uronode wfview wsjtx yaac xastir"
 fi
 
 # Add apps to temporarily disable from install/update process in this variable. Set to
@@ -883,6 +901,14 @@ do
       	NexusLocalRepoUpdate nexus-utils $NEXUS_UTILS_GIT_URL
       	;;
 
+		direwolf-utils)
+			NexusLocalRepoUpdate direwolf-utils $DIREWOLF_UTILS_GIT_URL
+			;;
+		
+		rigctl-utils
+		
+			;;
+      
       nexus-audio)
       	NexusLocalRepoUpdate nexus-audio $NEXUS_AUDIO_GIT_URL
       	;;
