@@ -42,7 +42,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.0.1
+#-    version         ${SCRIPT_NAME} 3.0.2
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -598,7 +598,7 @@ DESC[fllog]="QSO Logging Server"
 DESC[flmsg]="Forms Manager for Fldigi"
 DESC[flrig]="Rig Control for Fldigi"
 DESC[flwrap]="File Encapsulation for Fldigi"
-DESC[hamlib]="API for controlling radios (rigctl)"
+DESC[hamlib]="rig control (libhamlib4 and libhamlib-utils)"
 DESC[nexus-backup-restore]="Nexus Backup/Restore scripts"
 #DESC[nexus-iptables]="Firewall Rules for Nexus Image"
 DESC[nexus-rmsgw]="RMS Gateway software for the Nexus Image"
@@ -933,8 +933,12 @@ do
         	echo "===== $APP installed/updated ====="
       	;;
 
+		hamlib)
+			sudo apt -y install libhamlib4 libhamlib-utils || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
+			;;
+
 		ax25mail-utils|direwolf|fldigi|flcluster|flamp|fllog|\
-flmsg|flrig|flwrap|gpredict|hamlib|linpac|ax25-apps|ax25-tools|\
+flmsg|flrig|flwrap|gpredict|linpac|ax25-apps|ax25-tools|\
 pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
 			sudo apt -y install $APP || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
         	echo "===== $APP installed/updated ====="
