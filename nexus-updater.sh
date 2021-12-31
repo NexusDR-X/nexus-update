@@ -598,7 +598,7 @@ DESC[fllog]="QSO Logging Server"
 DESC[flmsg]="Forms Manager for Fldigi"
 DESC[flrig]="Rig Control for Fldigi"
 DESC[flwrap]="File Encapsulation for Fldigi"
-DESC[hamlib]="rig control (libhamlib4 and libhamlib-utils)"
+DESC[hamlib]="libhamlib4,libhamlib-utils,libhamlib-dev"
 DESC[nexus-backup-restore]="Nexus Backup/Restore scripts"
 #DESC[nexus-iptables]="Firewall Rules for Nexus Image"
 DESC[nexus-rmsgw]="RMS Gateway software for the Nexus Image"
@@ -934,7 +934,7 @@ do
       	;;
 
 		hamlib)
-			sudo apt -y install libhamlib4 libhamlib-utils || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
+			sudo apt -y install libhamlib4 libhamlib-utils libhamlib-dev || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
 			;;
 
 		ax25mail-utils|direwolf|fldigi|flcluster|flamp|fllog|\
