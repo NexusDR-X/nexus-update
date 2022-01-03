@@ -1023,12 +1023,12 @@ pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
 
       chirp)
          echo "===== $APP installation requested ====="
-         if sudo apt install chirp
+         if sudo apt -y install chirp
          then
          	continue
          else
          	echo >&2 "Chirp install failed."
-         	SafeExit 1
+          	SafeExit 1
          fi
          
          
