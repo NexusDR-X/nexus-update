@@ -371,6 +371,9 @@ function GenerateList () {
 						echo -e "FALSE\n$A\n${DESC[$A]}\nNew Install" >> "$TFILE"
 					fi
 					;;
+				nexus-audio)
+					echo -e "${CHECKED[$1]}\n$A\n${DESC[$A]}\nInstalled - Check for Updates" >> "$TFILE" 
+					;;
 				nexus-utils)
 					if command -v initialize-pi.sh 1>/dev/null 2>&1
 					then
@@ -504,6 +507,7 @@ function Help () {
 	APPS[wsjtx]="https://physics.princeton.edu/pulsar/K1JT/wsjtx.html"
 	APPS[xastir]="http://xastir.org/index.php/Main_Page"
 	APPS[nexus-backup-restore]="https://github.com/AG7GN/nexus-backup-restore/blob/master/README.md"
+	APPS[nexus-audio]="$NEXUSDRX_GIT_URL/nexus-audio/blob/master/README.md"
 	APPS[nexus-utils]="$NEXUSDRX_GIT_URL/nexus-utils/blob/master/README.md"
 	APPS[direwolf-utils]="$NEXUSDRX_GIT_URL/direwolf-utils/blob/master/README.md"
 	APPS[rigctl-utils]="$NEXUSDRX_GIT_URL/rigctl-utils/blob/master/README.md"
@@ -559,9 +563,9 @@ PIARDOP2_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardop2"
 CHIRP_URL="https://trac.chirp.danplanet.com/chirp_daily/LATEST"
 NEXUS_UPDATE_GIT_URL="$NEXUSDRX_GIT_URL/nexus-update"
 NEXUS_UTILS_GIT_URL="$NEXUSDRX_GIT_URL/nexus-utils"
+NEXUS_AUDIO_GIT_URL="$NEXUSDRX_GIT_URL/nexus-audio"
 DIREWOLF_UTILS_GIT_URL="$NEXUSDRX_GIT_URL/direwolf-utils"
 RIGCTL_UTILS_GIT_URL="$NEXUSDRX_GIT_URL/rigctl-utils"
-NEXUS_AUDIO_GIT_URL="$NEXUSDRX_GIT_URL/nexus-audio"
 AUTOHOTSPOT_GIT_URL="$GITHUB_URL/AG7GN/autohotspot"
 KENWOOD_GIT_URL="$GITHUB_URL/AG7GN/kenwood"
 NEXUS_BU_RS_GIT_URL="$GITHUB_URL/AG7GN/nexus-backup-restore"
@@ -599,6 +603,7 @@ DESC[flmsg]="Forms Manager for Fldigi"
 DESC[flrig]="Rig Control for Fldigi"
 DESC[flwrap]="File Encapsulation for Fldigi"
 DESC[hamlib]="libhamlib4,libhamlib-utils,libhamlib-dev"
+DESC[nexus-audio]="PulseAudio configuration for Fe-Pi"
 DESC[nexus-backup-restore]="Nexus Backup/Restore scripts"
 #DESC[nexus-iptables]="Firewall Rules for Nexus Image"
 DESC[nexus-rmsgw]="RMS Gateway software for the Nexus Image"
@@ -632,10 +637,10 @@ eval $(cat /etc/*-release | grep -E '^VERSION_CODENAME')
 if (( $(getconf LONG_BIT) == 64 ))
 then
 	PKG_TYPE="arm64.deb"
-	LIST="710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linpac nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw uronode wfview wsjtx yaac xastir"
+	LIST="710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw uronode wfview wsjtx yaac xastir"
 else
 	PKG_TYPE="armhf.deb"
-	LIST="710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linbpq linpac nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw uronode wfview wsjtx yaac xastir"
+	LIST="710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linbpq linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw uronode wfview wsjtx yaac xastir"
 fi
 
 # Add apps to temporarily disable from install/update process in this variable. Set to
@@ -915,7 +920,12 @@ do
 			;;
       
       nexus-audio)
-      	NexusLocalRepoUpdate nexus-audio $NEXUS_AUDIO_GIT_URL
+			if (NexusLocalRepoUpdate nexus-audio $NEXUS_AUDIO_GIT_URL)
+			then
+				echo >&2 "Restarting pulseaudio..."
+				systemctl --user restart pulseaudio 
+				echo >&2 "Done."
+			fi
       	;;
 
       nexus-backup-restore)
