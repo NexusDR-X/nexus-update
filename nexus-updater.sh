@@ -922,6 +922,7 @@ do
       nexus-audio)
 			if (NexusLocalRepoUpdate nexus-audio $NEXUS_AUDIO_GIT_URL)
 			then
+				(pgrep -x fldigi &>/dev/null) && pkill -SIGTERM -x fldigi
 				echo >&2 "Restarting pulseaudio..."
 				systemctl --user restart pulseaudio 
 				echo >&2 "Done."
