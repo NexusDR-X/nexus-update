@@ -42,7 +42,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.0.2
+#-    version         ${SCRIPT_NAME} 3.0.3
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -323,10 +323,16 @@ function CheckInternet() {
 	# Check for Internet connectivity
 	if ! ping -q -w 1 -c 1 github.com > /dev/null 2>&1
 	then
-   	yad --center --title="$TITLE" --info --borders=30 \
-      	 --text="<b>No Internet connection found.  Check your Internet connection \
+		if [[ $GUI == $TRUE ]]
+		then
+   		yad --center --title="$TITLE" --info --borders=30 \
+      		 --text="<b>No Internet connection found.  Check your Internet connection \
 and run this script again.</b>" --buttons-layout=center \
-	       --button=Close:0
+	      	 --button=Close:0
+	   else
+	   	echo >&2 "No Internet connection found.  Check your Internet connection \
+and run this script again."
+	   fi
    	SafeExit 1
 	fi
 
@@ -767,13 +773,20 @@ then
 	#echo "SRC_DIR and SHARE_DIR exported."
 fi
 
-(( $# == 0 )) && GUI=$TRUE || GUI=$FALSE
+(( $# == 0 )) && test $DISPLAY && GUI=$TRUE || GUI=$FALSE
 
 CheckInternet
 
-# Check for self updates requested
-if [[ $SELF_UPDATE == $TRUE ]] && NexusLocalRepoUpdate nexus-update $NEXUS_UPDATE_GIT_URL
+if [[ $SELF_UPDATE == $TRUE ]] && (LocalRepoUpdate nexus-update "$NEXUS_UPDATE_GIT_URL")
 then
+	pushd . >/dev/null
+	cd $SRC_DIR
+   if [[ -x nexus-update/nexus-install ]]
+   then
+   	nexus-update/nexus-install || Die "Failed to install/update nexus-update"
+     	echo "===== nexus-update installed/updated ====="
+	fi
+	popd >/dev/null
 	if [[ $GUI == $TRUE ]]
 	then
 		yad --center --title="$TITLE" --info --borders=30 \
