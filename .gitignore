@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# VIM temp files	
+*~
+
+# Mac
+.DS_Store
