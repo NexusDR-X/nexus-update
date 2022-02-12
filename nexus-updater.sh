@@ -528,7 +528,7 @@ function Help () {
 	APPS[smart-heard]="${NEXUSDRX_GIT_URL}/smart-heard/blob/main/README.md"
 	APPS[autohotspot]="https://github.com/AG7GN/autohotspot/blob/master/README.md"
 	APPS[710]="https://github.com/AG7GN/kenwood/blob/master/README.md"
-	APPS[rmsgw]="${NEXUSDRX_GIT_URL}/rmsgw/blob/master/README.md"
+	APPS[rmsgw]="${NEXUSDRX_GIT_URL}/package-staging/blob/main/rmsgw/README.md"
 	APPS[js8call]="http://js8call.com"
 	APPS[linbpq]="http://www.cantab.net/users/john.wiseman/Documents/InstallingLINBPQ.html"
 	APPS[linpac]="https://sourceforge.net/projects/linpac/"
