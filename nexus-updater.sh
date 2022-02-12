@@ -42,7 +42,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.0.4
+#-    version         ${SCRIPT_NAME} 3.0.5
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -463,6 +463,14 @@ function GenerateList () {
 						echo -e "FALSE\n$A\n${DESC[$A]}\nNew Install" >> "$TFILE"
 					fi
 					;;
+				smart-heard)
+					if [[ -s $HOME/WB7FHC/smart_heard.sh ]]
+					then
+						echo -e "${CHECKED[$1]}\n$A\n${DESC[$A]}\nInstalled - Check for Updates" >> "$TFILE"
+					else
+						echo -e "FALSE\n$A\n${DESC[$A]}\nNew Install" >> "$TFILE"
+					fi
+					;;
 				*)
 					#if command -v $A 1>/dev/null 2>&1 
 					if [[ -n $(InstalledPkgVersion $A) ]]
@@ -513,13 +521,14 @@ function Help () {
 	APPS[wsjtx]="https://physics.princeton.edu/pulsar/K1JT/wsjtx.html"
 	APPS[xastir]="http://xastir.org/index.php/Main_Page"
 	APPS[nexus-backup-restore]="https://github.com/AG7GN/nexus-backup-restore/blob/master/README.md"
-	APPS[nexus-audio]="$NEXUSDRX_GIT_URL/nexus-audio/blob/master/README.md"
-	APPS[nexus-utils]="$NEXUSDRX_GIT_URL/nexus-utils/blob/master/README.md"
-	APPS[direwolf-utils]="$NEXUSDRX_GIT_URL/direwolf-utils/blob/master/README.md"
-	APPS[rigctl-utils]="$NEXUSDRX_GIT_URL/rigctl-utils/blob/master/README.md"
+	APPS[nexus-audio]="${NEXUSDRX_GIT_URL}/nexus-audio/blob/main/README.md"
+	APPS[nexus-utils]="${NEXUSDRX_GIT_URL}/nexus-utils/blob/main/README.md"
+	APPS[direwolf-utils]="${NEXUSDRX_GIT_URL}/direwolf-utils/blob/main/README.md"
+	APPS[rigctl-utils]="${NEXUSDRX_GIT_URL}/rigctl-utils/blob/main/README.md"
+	APPS[smart-heard]="${NEXUSDRX_GIT_URL}/smart-heard/blob/main/README.md"
 	APPS[autohotspot]="https://github.com/AG7GN/autohotspot/blob/master/README.md"
 	APPS[710]="https://github.com/AG7GN/kenwood/blob/master/README.md"
-	APPS[rmsgw]="$NEXUSDRX_GIT_URL/rmsgw/blob/master/README.md"
+	APPS[rmsgw]="${NEXUSDRX_GIT_URL}/rmsgw/blob/master/README.md"
 	APPS[js8call]="http://js8call.com"
 	APPS[linbpq]="http://www.cantab.net/users/john.wiseman/Documents/InstallingLINBPQ.html"
 	APPS[linpac]="https://sourceforge.net/projects/linpac/"
@@ -567,11 +576,12 @@ GARIM_URL="https://www.whitemesa.net/garim/garim.html"
 PIARDOP_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardopc"
 PIARDOP2_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardop2"
 CHIRP_URL="https://trac.chirp.danplanet.com/chirp_daily/LATEST"
-NEXUS_UPDATE_GIT_URL="$NEXUSDRX_GIT_URL/nexus-update"
-NEXUS_UTILS_GIT_URL="$NEXUSDRX_GIT_URL/nexus-utils"
-NEXUS_AUDIO_GIT_URL="$NEXUSDRX_GIT_URL/nexus-audio"
-DIREWOLF_UTILS_GIT_URL="$NEXUSDRX_GIT_URL/direwolf-utils"
-RIGCTL_UTILS_GIT_URL="$NEXUSDRX_GIT_URL/rigctl-utils"
+NEXUS_UPDATE_GIT_URL="${NEXUSDRX_GIT_URL}/nexus-update"
+NEXUS_UTILS_GIT_URL="${NEXUSDRX_GIT_URL}/nexus-utils"
+NEXUS_AUDIO_GIT_URL="${NEXUSDRX_GIT_URL}/nexus-audio"
+DIREWOLF_UTILS_GIT_URL="${NEXUSDRX_GIT_URL}/direwolf-utils"
+RIGCTL_UTILS_GIT_URL="${NEXUSDRX_GIT_URL}/rigctl-utils"
+SMARTHEARD_GIT_URL="${NEXUSDRX_GIT_URL}/smart-heard"
 AUTOHOTSPOT_GIT_URL="$GITHUB_URL/AG7GN/autohotspot"
 KENWOOD_GIT_URL="$GITHUB_URL/AG7GN/kenwood"
 NEXUS_BU_RS_GIT_URL="$GITHUB_URL/AG7GN/nexus-backup-restore"
@@ -632,6 +642,7 @@ DESC[qsstv]="Receiving and transmitting SSTV/DSSTV"
 DESC[gpredict]="Real time satellite tracking"
 DESC[putty]="SSH, Telnet and serial console"
 DESC[wfview]="ICOM rig control and spectrum display"
+DESC[smart-heard]="WB7FHC's FSQ Heard Logger"
 
 MAINTAINER="ag7gn@arrl.net"
 
@@ -643,10 +654,10 @@ eval $(cat /etc/*-release | grep -E '^VERSION_CODENAME')
 if (( $(getconf LONG_BIT) == 64 ))
 then
 	PKG_TYPE="arm64.deb"
-	LIST="710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw uronode wfview wsjtx yaac xastir"
+	LIST="710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
 else
 	PKG_TYPE="armhf.deb"
-	LIST="710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linbpq linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw uronode wfview wsjtx yaac xastir"
+	LIST="710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linbpq linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
 fi
 
 # Add apps to temporarily disable from install/update process in this variable. Set to
@@ -769,6 +780,7 @@ then
 	SCRIPT_VARS_FILE="/${TMPDIR}/env.vars"
 	echo "SRC_DIR=/usr/local/src/nexus" > $SCRIPT_VARS_FILE
 	echo "SHARE_DIR=/usr/local/share/nexus" >> $SCRIPT_VARS_FILE
+	echo "NEXUSDRX_GIT_URL=$NEXUSDRX_GIT_URL" >> $SCRIPT_VARS_FILE
 	export $(cat $SCRIPT_VARS_FILE)
 	#echo "SRC_DIR and SHARE_DIR exported."
 fi
@@ -930,6 +942,10 @@ do
 		
 		rigctl-utils)
 			NexusLocalRepoUpdate rigctl-utils $RIGCTL_UTILS_GIT_URL		
+			;;
+      
+		smart-heard)
+			NexusLocalRepoUpdate smart-heard $SMARTHEARD_GIT_URL		
 			;;
       
       nexus-audio)
