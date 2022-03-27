@@ -7,8 +7,7 @@
 #+   ${SCRIPT_NAME} [-d DIRECTORY] [-l FILE] [-f FILE] [APP[,APP]...]
 #%
 #% DESCRIPTION
-#%   This script updates the Raspberry Pi image designed for use on the Nexus DR-X.
-#%   It can update the Raspbian OS as well as select ham applications.
+#%   This script updates Nexus DR-X files and scripts.
 #%
 #% OPTIONS
 #%    -h, --help              Print this help
@@ -42,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.0.5
+#-    version         ${SCRIPT_NAME} 3.0.7
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -575,7 +574,10 @@ ARIM_URL="https://www.whitemesa.net/arim/arim.html"
 GARIM_URL="https://www.whitemesa.net/garim/garim.html"
 PIARDOP_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardopc"
 PIARDOP2_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardop2"
-CHIRP_URL="https://trac.chirp.danplanet.com/chirp_daily/LATEST"
+#CHIRP_URL="https://trac.chirp.danplanet.com/chirp_daily/LATEST"
+CHIRP_URL="$GITHUB_URL/goldstar611/chirp-appimage/releases/latest"
+CHIRP_ICO="$GITHUB_URL/goldstar611/chirp/raw/master/share/chirp.png"
+CHIRP_DESKTOP="https://raw.githubusercontent.com/goldstar611/chirp/master/share/chirp.desktop"
 NEXUS_UPDATE_GIT_URL="${NEXUSDRX_GIT_URL}/nexus-update"
 NEXUS_UTILS_GIT_URL="${NEXUSDRX_GIT_URL}/nexus-utils"
 NEXUS_AUDIO_GIT_URL="${NEXUSDRX_GIT_URL}/nexus-audio"
@@ -1063,45 +1065,62 @@ pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
 
       chirp)
          echo "===== $APP installation requested ====="
-         if sudo apt -y install chirp
-         then
-         	continue
-         else
-         	echo >&2 "Chirp install failed."
-          	SafeExit 1
-         fi
-         
-         
+         ARCH="$(uname -m)"
+         case $ARCH in
+         	armv*)
+         		ARCH="armhf"
+         		;;
+         	aarch64)
+         		;;
+         	*)
+         		echo >&2 "=====  $APP_NAME installation FAILED. Unable to determine arch ====="
+         		SafeExit 1
+         		;;
+         esac
+			DOWNLOAD_URL="$(wget -qO - "$CHIRP_URL" | grep -E "href=.*${ARCH}.AppImage" | cut -d '"' -f2)"
+			[[ $DOWNLOAD_URL == "" ]] && { echo >&2 "===== $CHIRP_URL download failed with $? ====="; SafeExit 1; }
+			wget -qO chirp.temp "$GITHUB_URL/$DOWNLOAD_URL" || { echo >&2 "===== $GITHUB_URL/$DOWNLOAD_URL download failed with $? ====="; SafeExit 1; }
+			chmod +x chirp.temp
    		if command -v chirpw >/dev/null
    		then
-      		INSTALLED_VERSION="$($(command -v chirpw) --version | cut -d' ' -f 2)"
+      		INSTALLED_VERSION="$($(command -v chirpw) --version | cut -d' ' -f2)"
+      	else
+      		INSTALLED_VERSION="none"
    		fi      
-         CHIRP_TAR_FILE="$(wget -qO - $CHIRP_URL | grep "\.tar.gz" | grep -Eoi '<a [^>]+>' | grep -Eo 'href="[^\"]+"' | cut -d'"' -f2)"
-         [[ $CHIRP_TAR_FILE == "" ]] && { echo >&2 "===== $CHIRP_URL download failed with $? ====="; SafeExit 1; }
-			LATEST_VERSION="$(echo $CHIRP_TAR_FILE | sed 's/^chirp-//;s/.tar.gz//')"
-        	echo >&2 "Latest version: $LATEST_VERSION   Installed version: $INSTALLED_VERSION"
+			LATEST_VERSION="$(./chirp.temp --version | cut -d' ' -f2)"
+			echo >&2 "Latest version: $LATEST_VERSION   Installed version: $INSTALLED_VERSION"
          if [[ $INSTALLED_VERSION == $LATEST_VERSION && $FORCE == $FALSE ]]
          then
          	echo >&2 "===== $APP installed and up to date ====="
+         	rm -f chirp.temp
 				continue
 			fi
-        	CHIRP_URL="${CHIRP_URL}/${CHIRP_TAR_FILE}"
-        	echo "===== Downloading $CHIRP_URL ====="
-        	wget -q -O $CHIRP_TAR_FILE $CHIRP_URL || { echo >&2 "===== $CHIRP_URL download failed with $? ====="; SafeExit 1; }
-        	[ -s "$CHIRP_TAR_FILE" ] || { echo >&2 "===== $CHIRP_TAR_FILE is empty ====="; SafeExit 1; }
-        	CheckDepInstalled "python-gtk2 python-serial python-libxml2 python-future"
-        	tar xzf $CHIRP_TAR_FILE
-        	CHIRP_DIR="$(echo $CHIRP_TAR_FILE | sed 's/.tar.gz//')"
-        	cd $CHIRP_DIR
-        	sudo python setup.py install
+			sudo mv chirp.temp /usr/bin/chirpw
+			wget -qO chirp.png "$CHIRP_ICO"
+			[[ -s chirp.png ]] && sudo mv -f chirp.png /usr/share/pixmaps/
+         if [[ ! -s /usr/share/applications/chirp.desktop ]]
+         then
+        		cat > $HOME/.local/share/applications/chirp.desktop << EOF
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=CHIRP
+GenericName=Radio Programming Tool
+Comment=Program amateur radios
+Icon=chirp
+Exec=chirpw %F
+Terminal=false
+MimeType=inode/directory
+Categories=HamRadio
+Keywords=Hamradio;Programming;Handheld;Radio;Amateur;Programmer
+StartupNotify=true
+EOF
+				sudo mv -f $HOME/.local/share/applications/chirp.desktop /usr/share/applications/
+			fi
 			lxpanelctl restart
-			cd ..
-			rm -f $CHIRP_TAR_FILE
-			sudo rm -rf $CHIRP_DIR
-			sudo sed -i -e "s/Utility;//" /usr/local/share/applications/chirp.desktop 2>/dev/null
         	echo "===== $APP installed/updated ====="
 			;;
-
+			
      	linbpq)
      		INSTALL_PMON=$FALSE
      	   mkdir -p linbpq
