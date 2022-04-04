@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.0.7
+#-    version         ${SCRIPT_NAME} 3.0.8
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -581,6 +581,7 @@ CHIRP_DESKTOP="https://raw.githubusercontent.com/goldstar611/chirp/master/share/
 NEXUS_UPDATE_GIT_URL="${NEXUSDRX_GIT_URL}/nexus-update"
 NEXUS_UTILS_GIT_URL="${NEXUSDRX_GIT_URL}/nexus-utils"
 NEXUS_AUDIO_GIT_URL="${NEXUSDRX_GIT_URL}/nexus-audio"
+CHIRP_GIT_URL="${NEXUSDRX_GIT_URL}/chirp"
 DIREWOLF_UTILS_GIT_URL="${NEXUSDRX_GIT_URL}/direwolf-utils"
 RIGCTL_UTILS_GIT_URL="${NEXUSDRX_GIT_URL}/rigctl-utils"
 SMARTHEARD_GIT_URL="${NEXUSDRX_GIT_URL}/smart-heard"
@@ -1064,61 +1065,7 @@ pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
       	;;
 
       chirp)
-         echo "===== $APP installation requested ====="
-         ARCH="$(uname -m)"
-         case $ARCH in
-         	armv*)
-         		ARCH="armhf"
-         		;;
-         	aarch64)
-         		;;
-         	*)
-         		echo >&2 "=====  $APP_NAME installation FAILED. Unable to determine arch ====="
-         		SafeExit 1
-         		;;
-         esac
-			DOWNLOAD_URL="$(wget -qO - "$CHIRP_URL" | grep -E "href=.*${ARCH}.AppImage" | cut -d '"' -f2)"
-			[[ $DOWNLOAD_URL == "" ]] && { echo >&2 "===== $CHIRP_URL download failed with $? ====="; SafeExit 1; }
-			wget -qO chirp.temp "$GITHUB_URL/$DOWNLOAD_URL" || { echo >&2 "===== $GITHUB_URL/$DOWNLOAD_URL download failed with $? ====="; SafeExit 1; }
-			chmod +x chirp.temp
-   		if command -v chirpw >/dev/null
-   		then
-      		INSTALLED_VERSION="$($(command -v chirpw) --version | cut -d' ' -f2)"
-      	else
-      		INSTALLED_VERSION="none"
-   		fi      
-			LATEST_VERSION="$(./chirp.temp --version | cut -d' ' -f2)"
-			echo >&2 "Latest version: $LATEST_VERSION   Installed version: $INSTALLED_VERSION"
-         if [[ $INSTALLED_VERSION == $LATEST_VERSION && $FORCE == $FALSE ]]
-         then
-         	echo >&2 "===== $APP installed and up to date ====="
-         	rm -f chirp.temp
-				continue
-			fi
-			sudo mv chirp.temp /usr/bin/chirpw
-			wget -qO chirp.png "$CHIRP_ICO"
-			[[ -s chirp.png ]] && sudo mv -f chirp.png /usr/share/pixmaps/
-         if [[ ! -s /usr/share/applications/chirp.desktop ]]
-         then
-        		cat > $HOME/.local/share/applications/chirp.desktop << EOF
-[Desktop Entry]
-Type=Application
-Version=1.0
-Name=CHIRP
-GenericName=Radio Programming Tool
-Comment=Program amateur radios
-Icon=chirp
-Exec=chirpw %F
-Terminal=false
-MimeType=inode/directory
-Categories=HamRadio
-Keywords=Hamradio;Programming;Handheld;Radio;Amateur;Programmer
-StartupNotify=true
-EOF
-				sudo mv -f $HOME/.local/share/applications/chirp.desktop /usr/share/applications/
-			fi
-			lxpanelctl restart
-        	echo "===== $APP installed/updated ====="
+      	NexusLocalRepoUpdate chirp $CHIRP_GIT_URL
 			;;
 			
      	linbpq)
