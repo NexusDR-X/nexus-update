@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.0.8
+#-    version         ${SCRIPT_NAME} 3.0.10
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -652,7 +652,12 @@ MAINTAINER="ag7gn@arrl.net"
 # Determine OS
 # The following line gets VERSION_CODENAME
 eval $(cat /etc/*-release | grep -E '^VERSION_CODENAME')
-[[ ${VERSION_CODENAME^^} != "BULLSEYE" ]] && Die "${SCRIPT_NAME}: Must be running Raspbian OS Bullseye"
+if [[ ${VERSION_CODENAME^^} != "BULLSEYE" ]]
+then
+	echo >&2 -e "\033[1;33;41;5mERROR! ERROR! ERROR! \033[0m\033[1;33m This script will only run with RaspiOS \"Bullseye\" OS! \033[0m"
+	Die "${SCRIPT_NAME}: Wrong OS"
+fi
+
 # Determine package type based on 32 or 64 bit OS
 if (( $(getconf LONG_BIT) == 64 ))
 then
