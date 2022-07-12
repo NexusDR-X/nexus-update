@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.0.10
+#-    version         ${SCRIPT_NAME} 3.1.1
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -840,6 +840,52 @@ do
 done
 
 #-----------------------------------------------------------------------------------------
+# Make sure source code URIs are enabled
+sudo sed -i 's/^#deb-src/deb-src/' /etc/apt/sources.list
+sudo sed -i 's/^#deb-src/deb-src/' /etc/apt/sources.list.d/raspi.list
+
+#-----------------------------------------------------------------------------------------
+# Check age of apt cache. Run apt update if more than 2 hours old
+LAST_APT_UPDATE=$(stat -c %Z /var/lib/apt/lists/partial)
+NOW=$(date +%s)
+[[ -z $LAST_APT_UPDATE ]] && LAST_APT_UPDATE=0
+if (( $( expr $NOW - $LAST_APT_UPDATE ) > 7200 ))
+then
+	echo >&2 "Updating apt cache"
+	sudo apt update || AptError "'apt update' failed!"
+#else
+#	echo >&2 "apt cache less than an hour old"
+fi
+
+#-----------------------------------------------------------------------------------------
+# Check to see if libc6 updates are available. If yes, then need to apply
+# workaround for conflicting ax25.h file with libax25
+LIBC_PKGS=("libc6-dev" "libc-dev-bin" "libc6" "libc6-dbg")
+printf '%s\n' "${LIBC_PKGS[@]}" >/tmp/libc_packages
+if apt list --upgradable 2>/dev/null | grep -qf /tmp/libc_packages
+then
+	echo >&2 "Checking for libc6 conflicts..."
+   if [[ -n $(InstalledPkgVersion libax25) ]]
+   then
+      echo >&2 "libc6 updates available. Apply ax25.h workaround."
+      for F in ${LIBC_PKGS[@]}
+      do
+         apt download $F
+      done
+      DEBs="$(printf "%s_*.deb " "${LIBC_PKGS[@]}")"
+      sudo dpkg -i --force-overwrite $DEBs
+      echo >&2 "Reinstall libax25..."
+      apt download libax25
+      sudo dpkg -i --force-overwrite libax25_*.deb
+      echo "Done."
+      rm -f $DEBs libax25_*.deb
+   else
+   	echo >&2 "No libc6 conflicts found."
+   fi
+fi
+rm -f /tmp/libc_packages 
+
+#-----------------------------------------------------------------------------------------
 
 if [[ $GUI == $TRUE ]]
 then
@@ -900,21 +946,7 @@ then
 fi
 # If we get here, script was called with apps to install/update, so no GUI
 
-# Make sure source code URIs are enabled
-sudo sed -i 's/^#deb-src/deb-src/' /etc/apt/sources.list
-sudo sed -i 's/^#deb-src/deb-src/' /etc/apt/sources.list.d/raspi.list
 
-# Check age of apt cache. Run apt update if more than 2 hours old
-LAST_APT_UPDATE=$(stat -c %Z /var/lib/apt/lists/partial)
-NOW=$(date +%s)
-[[ -z $LAST_APT_UPDATE ]] && LAST_APT_UPDATE=0
-if (( $( expr $NOW - $LAST_APT_UPDATE ) > 7200 ))
-then
-	echo >&2 "Updating apt cache"
-	sudo apt update || AptError "'apt update' failed!"
-#else
-#	echo >&2 "apt cache less than an hour old"
-fi
 
 CheckDepInstalled "extra-xdg-menus bc dnsutils libgtk-3-bin jq xdotool moreutils exfatprogs build-essential autoconf automake libtool checkinstall git aptitude python3-tabulate python3-pip dos2unix firefox-esr wmctrl"
 
