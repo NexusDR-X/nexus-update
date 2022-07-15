@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.1.1
+#-    version         ${SCRIPT_NAME} 3.1.2
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -1102,6 +1102,7 @@ pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
       	;;
 
       chirp)
+      	CheckDepInstalled "libfuse2"
       	NexusLocalRepoUpdate chirp $CHIRP_GIT_URL
 			;;
 			
