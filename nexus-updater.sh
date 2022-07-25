@@ -858,6 +858,10 @@ then
 fi
 
 #-----------------------------------------------------------------------------------------
+# Fix bugs!
+[[ -f /var/lib/dpkg/info/rmsgw.postrm ]] && sudo sed -i -e "s/^cat </bash -c 'cat </" -e "s/ -$/ -'/" /var/lib/dpkg/info/rmsgw.postrm
+
+#-----------------------------------------------------------------------------------------
 # Check to see if libc6 updates are available. If yes, then need to apply
 # workaround for conflicting ax25.h file with libax25
 LIBC_PKGS=("libc6-dev" "libc-dev-bin" "libc6" "libc6-dbg")
