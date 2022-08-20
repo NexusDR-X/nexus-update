@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.1.2
+#-    version         ${SCRIPT_NAME} 3.1.3
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -540,6 +540,8 @@ function Help () {
 	APPS[wfview]="https://wfview.org/"
 	APPS[fllog]="http://www.w1hkj.com/fllog-help/"
 	APPS[flcluster]="http://www.w1hkj.com/flcluster-help/"
+	APPS[arim]="https://www.whitemesa.net/arim/arim.html"
+	APPS[garim]="https://www.whitemesa.net/arim/arim.html"
 	APP="$2"
 	xdg-open ${APPS[$APP]} 2>/dev/null &
 }
@@ -611,6 +613,7 @@ SWAP="$(grep "^CONF_SWAPSIZE" $SWAP_FILE | cut -d= -f2)"
 declare -A DESC
 DESC[710]="Rig Control Scripts for Kenwood 710/71A"
 DESC[arim]="Amateur Radio Instant Messaging"
+DESC[garim]="Amateur Radio Instant Messaging GUI"
 DESC[autohotspot]="Wireless HotSpot on your Pi"
 DESC[chirp]="Radio Programming Tool"
 DESC[direwolf]="Packet Modem/TNC and APRS Encoder/Decoder"
@@ -662,10 +665,10 @@ fi
 if (( $(getconf LONG_BIT) == 64 ))
 then
 	PKG_TYPE="arm64.deb"
-	LIST="710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
+	LIST="710 arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
 else
 	PKG_TYPE="armhf.deb"
-	LIST="710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap gpredict hamlib js8call linbpq linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
+	LIST="arim 710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linbpq linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
 fi
 
 # Add apps to temporarily disable from install/update process in this variable. Set to
@@ -1021,7 +1024,7 @@ do
 			sudo apt -y install libhamlib4 libhamlib-utils libhamlib-dev || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
 			;;
 
-		ax25mail-utils|direwolf|fldigi|flcluster|flamp|fllog|\
+		arim|garim|ax25mail-utils|direwolf|fldigi|flcluster|flamp|fllog|\
 flmsg|flrig|flwrap|gpredict|linpac|ax25-apps|ax25-tools|\
 pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
 			sudo apt -y install $APP || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
