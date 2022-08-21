@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.1.3
+#-    version         ${SCRIPT_NAME} 3.1.4
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -515,7 +515,7 @@ function Help () {
 	APPS[direwolf]="https://github.com/wb2osz/direwolf"
 	APPS[pat]="https://getpat.io/"
 	APPS[arim]="https://www.whitemesa.net/arim/arim.html"
-	APPS[piardop]="https://www.whitemesa.net/arim/arim.html"
+	APPS[ardop]="https://www.cantab.net/users/john.wiseman/Documents/ARDOPC.html"
 	#APPS[chirp]="https://chirp.danplanet.com/projects/chirp/wiki/Home"
 	APPS[wsjtx]="https://physics.princeton.edu/pulsar/K1JT/wsjtx.html"
 	APPS[xastir]="http://xastir.org/index.php/Main_Page"
@@ -574,8 +574,8 @@ GITHUB_URL="https://github.com"
 NEXUSDRX_GIT_URL="$GITHUB_URL/NexusDR-X"
 ARIM_URL="https://www.whitemesa.net/arim/arim.html"
 GARIM_URL="https://www.whitemesa.net/garim/garim.html"
-PIARDOP_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardopc"
-PIARDOP2_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardop2"
+#PIARDOP_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardopc"
+#PIARDOP2_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardop2"
 #CHIRP_URL="https://trac.chirp.danplanet.com/chirp_daily/LATEST"
 CHIRP_URL="$GITHUB_URL/goldstar611/chirp-appimage/releases/latest"
 CHIRP_ICO="$GITHUB_URL/goldstar611/chirp/raw/master/share/chirp.png"
@@ -612,6 +612,7 @@ SWAP="$(grep "^CONF_SWAPSIZE" $SWAP_FILE | cut -d= -f2)"
 
 declare -A DESC
 DESC[710]="Rig Control Scripts for Kenwood 710/71A"
+DESC[ardop]="Digital Open Protocol Modem versions 1 and 2"
 DESC[arim]="Amateur Radio Instant Messaging"
 DESC[garim]="Amateur Radio Instant Messaging GUI"
 DESC[autohotspot]="Wireless HotSpot on your Pi"
@@ -636,7 +637,6 @@ DESC[rigctl-utils]="Scripts and GUIs for rigctl"
 DESC[js8call]="Weak signal messaging using JS8"
 DESC[linpac]="AX.25 keyboard to keyboard chat and PBBS"
 DESC[linbpq]="G8BPQ AX25 Networking Package"
-DESC[piardop]="Digital Open Protocol Modem versions 1 and 2"
 DESC[pat]="Winlink email client"
 DESC[rmsgw]="Winlink RMS Gateway for Linux"
 DESC[uronode]="Node front end for AX.25, NET/ROM, Rose, TCP"
@@ -665,10 +665,10 @@ fi
 if (( $(getconf LONG_BIT) == 64 ))
 then
 	PKG_TYPE="arm64.deb"
-	LIST="710 arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
+	LIST="710 ardop arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
 else
 	PKG_TYPE="armhf.deb"
-	LIST="arim 710 autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linbpq linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
+	LIST="710 ardop arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linbpq linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
 fi
 
 # Add apps to temporarily disable from install/update process in this variable. Set to
@@ -1030,79 +1030,15 @@ pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
 			sudo apt -y install $APP || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
         	echo "===== $APP installed/updated ====="
       	;;
+      	
+      ardop)
+      	sudo apt -y install ardop ardop2 || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
+        	echo "===== $APP installed/updated ====="
+        	;;
 
    	nexus-update)
    		NexusLocalRepoUpdate nexus-update $NEXUS_UPDATE_GIT_URL
    		;;
-
-      arim)
-         echo "===== arim installation requested ====="
-         mkdir -p arim
-         cd arim
-         for URL in $ARIM_URL $GARIM_URL 
-         do
-            APP_NAME="$(echo ${URL##*/} | cut -d'.' -f1)"
-            ARIM_FILE="${URL##*/}"
-            curl -so $ARIM_FILE $URL || { echo >&2 "===== $URL download failed with $? ====="; SafeExit 1; }
-            TAR_FILE_URL="$(egrep 'https:.*arim.*[[:digit:]]+.tar.gz' $ARIM_FILE | grep -i 'current' | cut -d'"' -f2)"
-            [[ $TAR_FILE_URL == "" ]] && { echo >&2 "===== Download failed.  Could not find tar file URL ====="; SafeExit 1; }
-            rm -f $ARIM_FILE
-            TAR_FILE="${TAR_FILE_URL##*/}"
-            FNAME="$(echo $TAR_FILE | sed 's/.tar.gz//')"
-            LATEST_VERSION="$(echo $FNAME | cut -d'-' -f2)"
-            INSTALLED_VERSION="$($APP_NAME -v 2>/dev/null | grep -i "^$APP_NAME" | cut -d' ' -f2)"
-	        	echo >&2 "Latest version: $LATEST_VERSION   Installed version: $INSTALLED_VERSION"
-            if [[ $LATEST_VERSION != $INSTALLED_VERSION || $FORCE == $TRUE ]]
-            then
-     	         command -v piardopc >/dev/null || InstallPiardop
-               echo "===== Downloading $TAR_FILE_URL ====="
-               curl -so $TAR_FILE $TAR_FILE_URL || { echo >&2 "===== $TAR_FILE_URL download failed with $? ====="; SafeExit 1; }
-               if [[ $APP_NAME == "arim" ]]
-					then
-						CheckDepInstalled "libncurses5-dev libncursesw5-dev"
-					else
-						CheckDepInstalled "libfltk1.3-dev"
-					fi
-               tar xzf $TAR_FILE
-               ARIM_DIR="$(echo $TAR_FILE | sed 's/.tar.gz//')"
-               cd $ARIM_DIR
-               if ./configure && make -j4
-               then
-               	[[ $FORCE == $TRUE ]] && sudo dpkg -P nexus-$APP_NAME
-  						PACKAGE_VERSION="$(cat Makefile | grep "^PACKAGE_VERSION" | tr -d ' \t' | cut -d= -f2)"
-						if [[ $PACKAGE_VERSION =~ - ]]
-						then
-							PACKAGE_RELEASE="${PACKAGE_VERSION##*-}"
-							PACKAGE_VERSION="${PACKAGE_VERSION%%-*}"
-						else
-							PACKAGE_RELEASE=1
-						fi				
-						if CheckInstall nexus-$APP_NAME "$PACKAGE_VERSION" "$PACKAGE_RELEASE"
-						then
-							lxpanelctl restart
-							cd ..
-							sudo rm -rf $ARIM_DIR
-							rm -f $TAR_FILE
-							echo "===== $APP_NAME installed ====="
-						else
-							echo >&2 "=====  $APP_NAME installation FAILED ====="
-							cd ..
-							sudo rm -rf $ARIM_DIR
-							rm -f $TAR_FILE
-							SafeExit 1
-						fi
-					else
-						echo >&2 "=====  $APP_NAME make FAILED ====="
-						cd ..
-						sudo rm -rf $ARIM_DIR
-						rm -f $TAR_FILE
-						SafeExit 1
-					fi
-            else
-               echo "===== $APP_NAME is at latest version $LATEST_VERSION ====="
-            fi
-         done
-			;;
 
       autohotspot)
       	NexusLocalRepoUpdate autohotspot $AUTOHOTSPOT_GIT_URL
