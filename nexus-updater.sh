@@ -288,7 +288,7 @@ function CheckDepInstalled() {
 	echo >&2 "Done."
 }
 
-function InstallPiardop() {
+#function InstallPiardop() {
 # 	declare -A ARDOP
 # 	ARDOP[1]="$PIARDOP_URL"
 # 	ARDOP[2]="$PIARDOP2_URL"
@@ -312,7 +312,7 @@ function InstallPiardop() {
 #EOF
 #    	echo "=========== piardop version $V installed  ==========="
 #    done
-}
+#}
 
 
 function CheckInternet() {
