@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.1.4
+#-    version         ${SCRIPT_NAME} 3.1.5
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -289,21 +289,18 @@ function CheckDepInstalled() {
 }
 
 function InstallPiardop() {
-
-	# piardop only works on 32-bit OS!
-	
-	declare -A ARDOP
-	ARDOP[1]="$PIARDOP_URL"
-	ARDOP[2]="$PIARDOP2_URL"
-  	cd $HOME
-	for V in "${!ARDOP[@]}"
-	do
-   	echo "=========== Installing piardop version $V ==========="
-   	PIARDOP_BIN="${ARDOP[$V]##*/}"
-   	echo "=========== Downloading ${ARDOP[$V]} ==========="
-   	wget -q -O $PIARDOP_BIN "${ARDOP[$V]}" || { echo >&2 "======= ${ARDOP[$V]} download failed with $? ========"; SafeExit 1; }
-   	chmod +x $PIARDOP_BIN
-   	sudo mv $PIARDOP_BIN /usr/local/bin/
+# 	declare -A ARDOP
+# 	ARDOP[1]="$PIARDOP_URL"
+# 	ARDOP[2]="$PIARDOP2_URL"
+#   	cd $HOME
+# 	for V in "${!ARDOP[@]}"
+# 	do
+#    	echo "=========== Installing piardop version $V ==========="
+#    	PIARDOP_BIN="${ARDOP[$V]##*/}"
+#    	echo "=========== Downloading ${ARDOP[$V]} ==========="
+#    	wget -q -O $PIARDOP_BIN "${ARDOP[$V]}" || { echo >&2 "======= ${ARDOP[$V]} download failed with $? ========"; SafeExit 1; }
+#    	chmod +x $PIARDOP_BIN
+#    	sudo mv $PIARDOP_BIN /usr/local/bin/
 #	    cat >> $HOME/.asoundrc << EOF
 #pcm.ARDOP {
 #type rate
@@ -313,8 +310,8 @@ function InstallPiardop() {
 #}
 #}
 #EOF
-   	echo "=========== piardop version $V installed  ==========="
-   done
+#    	echo "=========== piardop version $V installed  ==========="
+#    done
 }
 
 
@@ -415,7 +412,7 @@ function GenerateList () {
 					echo -e "FALSE\n$A\n${DESC[$A]}\nUpdated Automatically" >> "$TFILE"
 					;;
 				piardop)
-					if command -v piardopc 1>/dev/null 2>&1 && command -v piardop2 1>/dev/null 2>&1
+					if command -v piardopc 1>/dev/null 2>&1 
 					then
 						echo -e "${CHECKED[$1]}\n$A\n${DESC[$A]}\nInstalled - Check for Updates" >> "$TFILE"
 					else
@@ -574,7 +571,7 @@ GITHUB_URL="https://github.com"
 NEXUSDRX_GIT_URL="$GITHUB_URL/NexusDR-X"
 ARIM_URL="https://www.whitemesa.net/arim/arim.html"
 GARIM_URL="https://www.whitemesa.net/garim/garim.html"
-#PIARDOP_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardopc"
+PIARDOP_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardopc"
 #PIARDOP2_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardop2"
 #CHIRP_URL="https://trac.chirp.danplanet.com/chirp_daily/LATEST"
 CHIRP_URL="$GITHUB_URL/goldstar611/chirp-appimage/releases/latest"
@@ -612,12 +609,13 @@ SWAP="$(grep "^CONF_SWAPSIZE" $SWAP_FILE | cut -d= -f2)"
 
 declare -A DESC
 DESC[710]="Rig Control Scripts for Kenwood 710/71A"
-DESC[ardop]="Digital Open Protocol Modem versions 1 and 2"
+#DESC[ardop]="Digital Open Protocol Modem versions 1 and 2"
 DESC[arim]="Amateur Radio Instant Messaging"
 DESC[garim]="Amateur Radio Instant Messaging GUI"
 DESC[autohotspot]="Wireless HotSpot on your Pi"
 DESC[chirp]="Radio Programming Tool"
 DESC[direwolf]="Packet Modem/TNC and APRS Encoder/Decoder"
+DESC[direwolf-utils]="Scripts and GUIs for Direwolf"
 DESC[flamp]="Amateur Multicast Protocol tool for Fldigi"
 DESC[flcluster]="Display DX Cluster data"
 DESC[fldigi]="Fast Light DIGItal Modem"
@@ -625,30 +623,29 @@ DESC[fllog]="QSO Logging Server"
 DESC[flmsg]="Forms Manager for Fldigi"
 DESC[flrig]="Rig Control for Fldigi"
 DESC[flwrap]="File Encapsulation for Fldigi"
+DESC[gpredict]="Real time satellite tracking"
 DESC[hamlib]="libhamlib4,libhamlib-utils,libhamlib-dev"
+DESC[js8call]="Weak signal messaging using JS8"
+DESC[linpac]="AX.25 keyboard to keyboard chat and PBBS"
+DESC[linbpq]="G8BPQ AX25 Networking Package"
 DESC[nexus-audio]="PulseAudio configuration for Fe-Pi"
 DESC[nexus-backup-restore]="Nexus Backup/Restore scripts"
 #DESC[nexus-iptables]="Firewall Rules for Nexus Image"
 DESC[nexus-rmsgw]="RMS Gateway software for the Nexus Image"
 DESC[nexus-update]="This Updater script"
 DESC[nexus-utils]="Scripts and Apps for Nexus Image"
-DESC[direwolf-utils]="Scripts and GUIs for Direwolf"
-DESC[rigctl-utils]="Scripts and GUIs for rigctl"
-DESC[js8call]="Weak signal messaging using JS8"
-DESC[linpac]="AX.25 keyboard to keyboard chat and PBBS"
-DESC[linbpq]="G8BPQ AX25 Networking Package"
 DESC[pat]="Winlink email client"
-DESC[rmsgw]="Winlink RMS Gateway for Linux"
-DESC[uronode]="Node front end for AX.25, NET/ROM, Rose, TCP"
-DESC[wsjtx]="Weak Signal Modes Modem"
-DESC[yaac]="Yet Another APRS Client"
-DESC[xastir]="APRS Tracking and Mapping Utility"
-DESC[qsstv]="Receiving and transmitting SSTV/DSSTV"
-#DESC[cqrlog]="Ham radio logger"
-DESC[gpredict]="Real time satellite tracking"
+DESC[piardop]="G8BPQ ARDOP Modem"
 DESC[putty]="SSH, Telnet and serial console"
-DESC[wfview]="ICOM rig control and spectrum display"
+DESC[qsstv]="Receiving and transmitting SSTV/DSSTV"
+DESC[rigctl-utils]="Scripts and GUIs for rigctl"
+DESC[rmsgw]="Winlink RMS Gateway for Linux"
 DESC[smart-heard]="WB7FHC's FSQ Heard Logger"
+DESC[uronode]="Node front end for AX.25, NET/ROM, Rose, TCP"
+DESC[wfview]="ICOM rig control and spectrum display"
+DESC[wsjtx]="Weak Signal Modes Modem"
+DESC[xastir]="APRS Tracking and Mapping Utility"
+DESC[yaac]="Yet Another APRS Client"
 
 MAINTAINER="ag7gn@arrl.net"
 
@@ -665,10 +662,10 @@ fi
 if (( $(getconf LONG_BIT) == 64 ))
 then
 	PKG_TYPE="arm64.deb"
-	LIST="710 ardop arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
+	LIST="710 arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
 else
 	PKG_TYPE="armhf.deb"
-	LIST="710 ardop arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linbpq linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
+	LIST="710 arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linbpq linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
 fi
 
 # Add apps to temporarily disable from install/update process in this variable. Set to
@@ -1031,11 +1028,6 @@ pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
         	echo "===== $APP installed/updated ====="
       	;;
       	
-      ardop)
-      	sudo apt -y install ardop ardop2 || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
-        	echo "===== $APP installed/updated ====="
-        	;;
-
    	nexus-update)
    		NexusLocalRepoUpdate nexus-update $NEXUS_UPDATE_GIT_URL
    		;;
@@ -1150,7 +1142,22 @@ EOF
 			;;
 			
 		piardop)
-			InstallPiardop
+			echo "=========== Installing piardop ==========="
+			echo "=========== Downloading $PIARDOP_URL ==========="
+			wget -q -O $TMPDIR/piardopc "$PIARDOP_URL" || { echo >&2 "======= ${ARDOP[$V]} download failed with $? ========"; SafeExit 1; }
+			chmod +x $TMPDIR/piardopc
+			LATEST_VERSION="$($TMPDIR/piardopc -h | grep -i '^ARDOPC Version' | tr -d '\r' | cut -d' ' -f3)"
+			INSTALLED_VERSION="$(piardopc -h | grep -i "^ARDOPC Version" | tr -d '\r' | cut -d' ' -f3)"
+			[[ -z $LATEST_VERSION ]] && { echo >&2 "======= Unable to determine latest version of piardopc ========"; SafeExit 1; }
+			echo "LATEST Version: $LATEST_VERSION    INSTALLED Version: $INSTALLED_VERSION"
+			if [[ $INSTALLED_VERSION != $LATEST_VERSION ]]
+			then
+				sudo mv -f $TMPDIR/piardopc /usr/local/bin/
+				echo "=========== piardop version $LATEST_VERSION installed  ==========="
+			else
+				rm -f $TMPDIR/piardopc
+				echo "=========== piardop already at latest version  ==========="
+			fi
 			;;
 
       *)
