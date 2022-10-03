@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.1.5
+#-    version         ${SCRIPT_NAME} 3.1.6
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -857,6 +857,8 @@ then
 #	echo >&2 "apt cache less than an hour old"
 fi
 
+echo >&2 "Generating app list. Stand by."
+
 #-----------------------------------------------------------------------------------------
 # Fix bugs!
 [[ -f /var/lib/dpkg/info/rmsgw.postrm ]] && sudo sed -i -e "s/^cat </bash -c 'cat </" -e "s/ -$/ -'/" /var/lib/dpkg/info/rmsgw.postrm
@@ -887,7 +889,7 @@ then
    	echo >&2 "No libc6 conflicts found."
    fi
 fi
-rm -f /tmp/libc_packages 
+rm -f /tmp/libc_packages
 
 #-----------------------------------------------------------------------------------------
 
@@ -1011,7 +1013,7 @@ do
       	echo "===== $APP installed/updated ====="
       	pushd . >/dev/null
       	cd $HOME
-      	apt -y download $APP
+      	apt download $APP
       	popd >/dev/null
       	sudo dpkg -i --force-overwrite $HOME/libax25_*${PKG_TYPE} || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
         	echo "===== $APP installed/updated ====="
