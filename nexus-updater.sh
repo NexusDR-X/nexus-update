@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.1.7
+#-    version         ${SCRIPT_NAME} 3.1.8
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -354,7 +354,7 @@ function GenerateList () {
 			echo -e "FALSE\n${WARN_OPEN}<s>$A</s>${WARN_CLOSE}\n${WARN_OPEN}<s>${DESC[$A]}</s>${WARN_CLOSE}\n${WARN_OPEN}SUSPENDED pending bug fixes${WARN_CLOSE}" >> "$TFILE"
 		else
 			case $A in
-				autohotspot)
+				autohotspot|raspbian)
 					echo -e "${CHECKED[$1]}\n$A\n${DESC[$A]}\nInstalled - Check for Updates" >> "$TFILE" 
 					;;
 				chirp)
