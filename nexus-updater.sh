@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.1.6
+#-    version         ${SCRIPT_NAME} 3.1.7
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -544,6 +544,24 @@ function Help () {
 }
 export -f Help
 
+function InstallLibax25 () {
+	# Force-installs libax25 due to longstanding conflict with header file in
+	# libc6.
+	# Returns 0 if successful, 1 if not.
+	local RESULT=0
+	pushd . >/dev/null
+	cd $HOME
+	if apt download libax25
+	then
+		sudo dpkg -i --force-overwrite $HOME/libax25_*${PKG_TYPE}
+		RESULT=$?
+		rm -f $HOME/libax25_*${PKG_TYPE}
+	else
+		RESULT=1
+	fi
+	popd >/dev/null
+	return $RESULT
+}
 
 #============================
 #  FILES AND VARIABLES
@@ -608,6 +626,7 @@ SWAP_FILE="/etc/dphys-swapfile"
 SWAP="$(grep "^CONF_SWAPSIZE" $SWAP_FILE | cut -d= -f2)"
 
 declare -A DESC
+DESC[raspbian]="Raspbian OS and Apps"
 DESC[710]="Rig Control Scripts for Kenwood 710/71A"
 #DESC[ardop]="Digital Open Protocol Modem versions 1 and 2"
 DESC[arim]="Amateur Radio Instant Messaging"
@@ -662,10 +681,10 @@ fi
 if (( $(getconf LONG_BIT) == 64 ))
 then
 	PKG_TYPE="arm64.deb"
-	LIST="710 arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
+	LIST="raspbian 710 arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
 else
 	PKG_TYPE="armhf.deb"
-	LIST="710 arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linbpq linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
+	LIST="raspbian 710 arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linbpq linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
 fi
 
 # Add apps to temporarily disable from install/update process in this variable. Set to
@@ -881,10 +900,9 @@ then
       DEBs="$(printf "%s_*.deb " "${LIBC_PKGS[@]}")"
       sudo dpkg -i --force-overwrite $DEBs
       echo >&2 "Reinstall libax25..."
-      apt download libax25
-      sudo dpkg -i --force-overwrite libax25_*.deb
-      echo "Done."
-      rm -f $DEBs libax25_*.deb
+		InstallLibax25 || { echo >&2 "===== libax25 reinstall failed. ====="; SafeExit 1; }      
+		echo "Done."
+      rm -f $DEBs
    else
    	echo >&2 "No libc6 conflicts found."
    fi
@@ -972,6 +990,10 @@ do
 	#echo "$SUSPENDED_APPS" |  grep -q "$APP" && continue
 	cd $SRC_DIR
    case $APP in
+   	raspbian)
+			echo -e "\n===== Raspbian OS Update Requested ====="
+			sudo apt -m -y upgrade && echo -e "===== Raspbian OS Update Finished ====="
+			;;
       710)
       	NexusLocalRepoUpdate "710 scripts" $KENWOOD_GIT_URL
       	;;
@@ -1010,13 +1032,16 @@ do
       	;;
 
       libax25)
-      	echo "===== $APP installed/updated ====="
-      	pushd . >/dev/null
-      	cd $HOME
-      	apt download $APP
-      	popd >/dev/null
-      	sudo dpkg -i --force-overwrite $HOME/libax25_*${PKG_TYPE} || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
-        	echo "===== $APP installed/updated ====="
+      	echo "===== $APP install/update requested ====="
+      	if [[ -z $(InstalledPkgVersion libax25) ]] || \
+      		[[ $FORCE == $TRUE ]] || \
+      		(apt list --upgradable 2>/dev/null | grep -q "^libax25")
+			then
+				InstallLibax25 || { echo >&2 "===== $APP install/update failed. ====="; SafeExit 1; }
+        		echo "===== $APP installed/updated ====="
+        	else
+				echo "===== $APP already installed and up-to-date  ====="
+        	fi
       	;;
 
 		hamlib)
