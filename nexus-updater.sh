@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.1.8
+#-    version         ${SCRIPT_NAME} 3.1.9
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -539,6 +539,7 @@ function Help () {
 	APPS[flcluster]="http://www.w1hkj.com/flcluster-help/"
 	APPS[arim]="https://www.whitemesa.net/arim/arim.html"
 	APPS[garim]="https://www.whitemesa.net/arim/arim.html"
+	APPS[libax25]="https://github.com/ve7fet/linuxax25"
 	APP="$2"
 	xdg-open ${APPS[$APP]} 2>/dev/null &
 }
@@ -645,8 +646,9 @@ DESC[flwrap]="File Encapsulation for Fldigi"
 DESC[gpredict]="Real time satellite tracking"
 DESC[hamlib]="libhamlib4,libhamlib-utils,libhamlib-dev"
 DESC[js8call]="Weak signal messaging using JS8"
-DESC[linpac]="AX.25 keyboard to keyboard chat and PBBS"
+DESC[libax25]="VE7FET's libax25, ax25-apps, ax25-tools"
 DESC[linbpq]="G8BPQ AX25 Networking Package"
+DESC[linpac]="AX.25 keyboard to keyboard chat and PBBS"
 DESC[nexus-audio]="PulseAudio configuration for Fe-Pi"
 DESC[nexus-backup-restore]="Nexus Backup/Restore scripts"
 #DESC[nexus-iptables]="Firewall Rules for Nexus Image"
@@ -681,10 +683,10 @@ fi
 if (( $(getconf LONG_BIT) == 64 ))
 then
 	PKG_TYPE="arm64.deb"
-	LIST="raspbian 710 arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
+	LIST="raspbian 710 arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call libax25 linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
 else
 	PKG_TYPE="armhf.deb"
-	LIST="raspbian 710 arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call linbpq linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
+	LIST="raspbian 710 arim autohotspot chirp direwolf direwolf-utils flamp flcluster fldigi fllog flmsg flrig flwrap garim gpredict hamlib js8call libax25 linbpq linpac nexus-audio nexus-backup-restore nexus-update nexus-utils pat piardop qsstv rigctl-utils rmsgw smart-heard uronode wfview wsjtx yaac xastir"
 fi
 
 # Add apps to temporarily disable from install/update process in this variable. Set to
@@ -889,10 +891,10 @@ LIBC_PKGS=("libc6-dev" "libc-dev-bin" "libc6" "libc6-dbg")
 printf '%s\n' "${LIBC_PKGS[@]}" >/tmp/libc_packages
 if apt list --upgradable 2>/dev/null | grep -qf /tmp/libc_packages
 then
-	echo >&2 "Checking for libc6 conflicts..."
+	echo >&2 "Checking for libc6 and libax25 conflicts..."
    if [[ -n $(InstalledPkgVersion libax25) ]]
    then
-      echo >&2 "libc6 updates available. Apply ax25.h workaround."
+      echo >&2 "libc6 updates available and libax25 installed. Apply ax25.h workaround."
       for F in ${LIBC_PKGS[@]}
       do
          apt download $F
@@ -901,11 +903,19 @@ then
       sudo dpkg -i --force-overwrite $DEBs
       echo >&2 "Reinstall libax25..."
 		InstallLibax25 || { echo >&2 "===== libax25 reinstall failed. ====="; SafeExit 1; }      
-		echo "Done."
-      rm -f $DEBs
-   else
-   	echo >&2 "No libc6 conflicts found."
+		echo >&2 "Done."
+      rm -f $DEBs 
+	else
+  		echo >&2 "Upgrade ${LIBC_PKGS[@]}"
+		sudo apt -y install ${LIBC_PKGS[@]} || { echo >&2 "===== ${LIBC_PKGS[@]} upgrade failed. ====="; SafeExit 1; }		
+		echo >&2 "Done."
    fi
+fi
+if apt list --upgradable 2>/dev/null | grep -q "^libax25"
+then
+   echo >&2 "Upgrade libax25 using libc6 conflict workaround..."
+	InstallLibax25 || { echo >&2 "===== libax25 reinstall failed. ====="; SafeExit 1; }      
+	echo "Done."   	
 fi
 rm -f /tmp/libc_packages
 
@@ -1042,6 +1052,7 @@ do
         	else
 				echo "===== $APP already installed and up-to-date  ====="
         	fi
+        	sudo apt -y install ax25-apps ax25-tools || { echo >&2 "===== ax25-apps or ax25-tools install/update failed. ====="; SafeExit 1; }
       	;;
 
 		hamlib)
