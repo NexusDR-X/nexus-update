@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.1.9
+#-    version         ${SCRIPT_NAME} 3.1.10
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -358,7 +358,7 @@ function GenerateList () {
 					echo -e "${CHECKED[$1]}\n$A\n${DESC[$A]}\nInstalled - Check for Updates" >> "$TFILE" 
 					;;
 				chirp)
-					if command -v chirpw 1>/dev/null 2>&1
+					if command -v chirp 1>/dev/null 2>&1
 					then
 						echo -e "${CHECKED[$1]}\n$A\n${DESC[$A]}\nInstalled - Check for Updates" >> "$TFILE" 
 					else
@@ -596,6 +596,7 @@ PIARDOP_URL="http://www.cantab.net/users/john.wiseman/Downloads/Beta/piardopc"
 CHIRP_URL="$GITHUB_URL/goldstar611/chirp-appimage/releases/latest"
 CHIRP_ICO="$GITHUB_URL/goldstar611/chirp/raw/master/share/chirp.png"
 CHIRP_DESKTOP="https://raw.githubusercontent.com/goldstar611/chirp/master/share/chirp.desktop"
+CHIRPNEXT_URL="https://trac.chirp.danplanet.com/download?stream=next"
 NEXUS_UPDATE_GIT_URL="${NEXUSDRX_GIT_URL}/nexus-update"
 NEXUS_UTILS_GIT_URL="${NEXUSDRX_GIT_URL}/nexus-utils"
 NEXUS_AUDIO_GIT_URL="${NEXUSDRX_GIT_URL}/nexus-audio"
@@ -1075,8 +1076,79 @@ pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
       	;;
 
       chirp)
-      	CheckDepInstalled "libfuse2"
-      	NexusLocalRepoUpdate chirp $CHIRP_GIT_URL
+      	# Remove old local git repo
+      	[[ -d $SRC_DIR/chirp/.git ]] && rm -rf $SRC_DIR/chirp
+      	mkdir -p $SRC_DIR/chirp
+      	_URL="$CHIRPNEXT_URL"
+			MAXTRIES=3
+			COUNTER=0
+			while [ $COUNTER -lt $MAXTRIES ]
+			do
+				echo >&2 "===== $APP install/upgrade was requested from $_URL ====="
+		   	wget -q -O $TMPDIR/chirp.html "$_URL" && break
+		  		sleep 5
+		  		let COUNTER=COUNTER+1
+			done
+			if [ $COUNTER -ge $MAXTRIES ]
+			then
+				echo >&2 "======= $_URL download failed with $? ========"
+				SafeExit 1
+			fi
+
+			# Obtain the filename of the latest available version and assign it to $href
+			eval $(egrep -o 'href="chirp-[[:digit:]]{8}-py3-none-any.whl"' $TMPDIR/chirp.html) || { echo >&2 "======= Failed to find $APP file at $_URL ========"; SafeExit 1; }
+			[[ -z $href ]] && { echo >&2 "======= Failed to find $APP file at $_URL ========"; SafeExit 1; }
+			
+			# Obtain filename of currently installed version
+			INSTALLED_VERSION="$($(command -v chirp) --version 2>/dev/null | egrep -o "[[:digit:]]{8}")"
+			echo >&2 "Latest version: $(egrep -o '[[:digit:]]{8}' <<<$href)   Installed version: $INSTALLED_VERSION"
+			if [[ -n $INSTALLED_VERSION ]]
+			then
+			   if [[ $href =~ $INSTALLED_VERSION ]]
+			   then
+			   	if [[ $FORCE == $TRUE ]]
+			   	then
+			   		INSTALL_TYPE="reinstall chirp"
+			      else
+			      	echo "===== $APP is installed and up to date ====="
+			      	continue
+			      fi
+			   else
+					INSTALL_TYPE="upgrade chirp"			   	
+			   fi
+			else
+				INSTALL_TYPE="install --system-site-packages $SRC_DIR/chirp/$href"
+			fi
+      	#CheckDepInstalled "libfuse2"
+      	CheckDepInstalled "git python3-wxgtk4.0 python3-serial python3-six python3-future python3-requests python3-pip"
+      	pip3 show pipx &>/dev/null || sudo pip3 install pipx
+      	_URL2="$(egrep -o 'Index of /chirp.*[[:digit:]]{8}' $TMPDIR/chirp.html | cut -d' ' -f3)"
+			CHIRPFILE_URL="${_URL%/*}${_URL2}/${href}"
+			wget -q -O $SRC_DIR/chirp/$href "$CHIRPFILE_URL" || { echo >&2 "======= $CHIRPFILE_URL download failed with $? ========"; SafeExit 1; }
+      	if pipx $INSTALL_TYPE 
+      	then
+      		sudo rm -f /usr/local/bin/chirp /usr/local/bin/chirpc
+      		sudo ln -s $HOME/.local/bin/chirp /usr/local/bin/chirp 
+      		sudo ln -s $HOME/.local/bin/chirpc /usr/local/bin/chirpc 
+      		sudo rm -f /usr/share/applications/chirp.desktop
+      		sudo rm -f /usr/bin/chirpw
+      		sudo rm -f /usr/local/src/nexus/chirp/Chirp-daily-*.AppImage
+      		cat > $HOME/.local/share/applications/chirp.desktop << EOF
+[Desktop Entry]
+Name=CHIRP
+GenericName=Radio Programming Tool
+Comment=Program amateur radios
+Icon=chirp
+Exec=chirp %F
+Terminal=false
+Categories=HamRadio;
+Type=Application
+EOF
+				echo >&2 "============= $APP installed/updated ================="
+      	else
+      		echo >&2 "======= 'pipx $INSTALL_TYPE' FAILED!  ========"
+      		continue
+      	fi
 			;;
 			
      	linbpq)
