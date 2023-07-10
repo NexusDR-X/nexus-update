@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.1.10
+#-    version         ${SCRIPT_NAME} 3.1.11
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -1144,6 +1144,8 @@ Terminal=false
 Categories=HamRadio;
 Type=Application
 EOF
+				wget -q -O $SRC_DIR/chirp/chirp.png "https://github.com/kk7ds/chirp/raw/master/chirp/share/chirp.ico" 2>/dev/null
+				[[ -s $SRC_DIR/chirp/chirp.png ]] && sudo cp -f $SRC_DIR/chirp/chirp.png /usr/share/pixmaps/
 				echo >&2 "============= $APP installed/updated ================="
       	else
       		echo >&2 "======= 'pipx $INSTALL_TYPE' FAILED!  ========"
