@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.1.11
+#-    version         ${SCRIPT_NAME} 3.1.12
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -1108,7 +1108,8 @@ pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
 			   then
 			   	if [[ $FORCE == $TRUE ]]
 			   	then
-			   		INSTALL_TYPE="reinstall chirp"
+			   		#INSTALL_TYPE="reinstall chirp"
+			   		INSTALL_TYPE="install --force --pip-args='--force-reinstall' --system-site-packages $SRC_DIR/chirp/$href"
 			      else
 			      	echo "===== $APP is installed and up to date ====="
 			      	continue
