@@ -41,7 +41,7 @@
 #%    
 #================================================================
 #- IMPLEMENTATION
-#-    version         ${SCRIPT_NAME} 3.1.12
+#-    version         ${SCRIPT_NAME} 3.1.13
 #-    author          Steve Magnuson, AG7GN
 #-    license         CC-BY-SA Creative Commons License
 #-    script_id       0
@@ -1077,7 +1077,8 @@ pat|qsstv|rmsgw|uronode|wfview|xastir|wsjtx|js8call)
 
       chirp)
       	# Remove old local git repo
-      	[[ -d $SRC_DIR/chirp/.git ]] && rm -rf $SRC_DIR/chirp
+      	#[[ -d $SRC_DIR/chirp/.git ]] && rm -rf $SRC_DIR/chirp
+      	rm -rf $SRC_DIR/chirp
       	mkdir -p $SRC_DIR/chirp
       	_URL="$CHIRPNEXT_URL"
 			MAXTRIES=3
